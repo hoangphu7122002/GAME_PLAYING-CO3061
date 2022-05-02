@@ -1,4 +1,5 @@
 from interface_game.Minmax_class import *
+from MinimaxIsolation import *
 
 class MinimaxII(MinimaxInterface):
     def __init__(self,depth,path = {}):
@@ -28,6 +29,9 @@ class MinimaxII(MinimaxInterface):
             return self.sample_act(board,player)
         old,new = self.env.aimove(board,player)        
         return old,new
+    
+    def check_win(self,board,player):
+        return self.env.evaluate_board(board,player),self.env.checkEnd(board,player)
     
     def getBoard(self):
         pass

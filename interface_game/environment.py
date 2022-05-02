@@ -6,7 +6,8 @@ from abc import ABCMeta, abstractmethod
 class BaseEnvironment:
     __metaclass__ = ABCMeta
 
-    def __init__(self,path={}):
+    @abstractmethod
+    def __init__(self,depth,path={}):
         pass
 
     @abstractmethod
