@@ -11,32 +11,17 @@ class BaseEnvironment:
         pass
 
     @abstractmethod
-    def env_start(self):
+    def env_act(self):
         pass
-
-    @abstractmethod
-    def env_step(self, action):
-        pass
-
-    @abstractmethod
-    def env_cleanup(self):
-        pass
-
-    @abstractmethod
-    def env_message(self, message):
-        pass
-        
+     
     @abstractmethod
     def reset(self,player,depth,path):
         pass
     
     @abstractmethod
     def check_win(self):
-    
-    @abstractmethod
-    def step(self,action):
         pass
     
     @abstractmethod
-    def isValid(self,action):
+    def step(self,action):
         pass

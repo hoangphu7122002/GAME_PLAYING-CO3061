@@ -7,7 +7,7 @@ ACTIVE = {1 : ACTIVE_P1, -1 : ACTIVE_P2}
 
 #cell neighbor position
 dx = [-1,0,1,1,1,0,-1,-1]
-dy = [1,1,1,0,-1.-1,-1,0]
+dy = [1,1,1,0,-1,-1,-1,0]
 
 #hyper_parameter
 WIDTH = 6

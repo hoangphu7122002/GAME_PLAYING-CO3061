@@ -13,7 +13,7 @@ class MinimaxIsolation(Minimax):
             self.board = board
         else:
             self.board = np.zeros((WIDTH,WIDTH))
-        self.pos_agent = [(0,0),(0,0)]
+        self.pos_agent = [(0,0),(0,0),(0,0)]
         self.pos_agent[1] = (0,3)
         self.pos_agent[-1] = (5,2)
         self.board[0][3] = ACTIVE_P1
@@ -73,22 +73,25 @@ class MinimaxIsolation(Minimax):
         result = self.minimax(board,player,maximizer,alpha=float('-inf'),beta=float('inf'),depth=self.MINIMAX_DEPTH)
         if result[1] is None:
             print("No move at all!!")
-            return None
+            return None,None
         return result[1]
     
     def aimove(self,board,player):
         move = self.move(board,player)
         if move == None:
-            return None
+            return None,None
         self.move_piece(board,player,move[0],move[1])
         return move[0],move[1]
     
     def evaluate_board(self,board,agent_flag):
-        x,y = self.pos_agent[agent_flag]         
+        x,y = self.pos_agent[-agent_flag]         
         emp_cells = self.get_all_empty_cell(board,x,y)
         
         return (8 - len(emp_cells)) * agent_flag
     
+    def check_win(self,board,current_turn):
+        return self.evaluate_board(board,current_turn),self.checkEnd(board,current_turn)
+        
     def in_board(self,x,y):
         if x < 0 or x >= WIDTH:
             return False
@@ -97,7 +100,7 @@ class MinimaxIsolation(Minimax):
         return True
 
     def checkEnd(self,board,agent_flag):
-        x,y = self.pos_agent[agent_flag]         
+        x,y = self.pos_agent[-agent_flag]         
         emp_cells = self.get_all_empty_cell(board,x,y)
         if len(emp_cells) == 0:
             #lose
@@ -214,14 +217,22 @@ class MinimaxIsolation(Minimax):
         valid_move = False
         
         while not valid_move:
-            print("your turn {} with value:".format(player))
-            x_new = int(input('x_pos: '))
-            y_new = int(input('y_pos: '))
+            if player == 1:
+                name = 'P1'
+            else:
+                name = 'P2'
+            print("your turn {} with value:".format(name))
+            x_now,y_now = self.pos_agent[player]
+            print("now:",x_now,y_now)
+            x_new,y_new = input('pos: ').split(' ')
+            x_new = int(x_new)
+            y_new = int(y_new)
             if self.in_board(x_new,y_new) == False or board[x_new][y_new] != FREE:
                 print('ERROR because block not free')
                 continue
-            x_now,y_now = self.pos_agent[player]
-            available_move = self.get_all_nearby_cell(board,x_now,y_now)
+            print("new: ",x_new,y_new)
+            available_move = self.get_all_empty_cell(board,x_now,y_now)
+            print(available_move)
             if (x_new,y_new) in available_move:
                 valid_move = True
                 print('valid_move!!!')
@@ -232,10 +243,14 @@ class MinimaxIsolation(Minimax):
                 
                 #componet BLOCK
                 print("remove block for component")
+                x_comp,y_comp = self.pos_agent[-player]
+                print("comp:",x_comp,y_comp)
                 comp_flag = True
                 while comp_flag:
-                    x_comp = int(input('x_pos: '))
-                    y_comp = int(input('y_comp: '))
+                    x_comp,y_comp = input('block_comp: ').split(' ')
+                    x_comp = int(x_comp)
+                    y_comp = int(y_comp)
+                    # y_comp = int(input('y_comp: '))
                     if self.in_board(x_comp,y_comp) == False or board[x_comp][y_comp] != FREE:
                         print("try again")
                         continue
