@@ -30,6 +30,10 @@ class Minimax(object):
         pass
     
     @abstractmethod
+    def print_board(self,board):
+        pass
+    
+    @abstractmethod
     def evaluate_board(self,board,agent_flag):
         pass
     

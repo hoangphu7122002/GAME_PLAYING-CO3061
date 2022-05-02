@@ -28,6 +28,40 @@ class MinimaxIsolation(Minimax):
                 cells.append((x_nei,y_nei))
         return cells            
         
+    def print_board(self,board):
+        head_col = "      "
+        for ele in range(0,len(board)):
+            head_col += str(ele)
+            head_col += '  '
+        line = "    "
+        line += "-" * 19
+        line += '\n'
+        head_col += '\n'
+        head_col += line
+        row = [""] * len(board)
+        index = 0
+        for i in range(len(board)):
+            row[i] += str(i)
+            row[i] += '   |'
+            for ele in board[index]:
+                if ele == 1:
+                    row[i] += 'P1|'
+                elif ele == -1:
+                    row[i] += 'P2|'
+                elif ele == 0:
+                    row[i] += '  |'
+                else:
+                    row[i] += 'XX|'
+            row[i] += '\n'
+            index += 1
+        for ele in row:
+            head_col += ele
+        line = "    "
+        line += "-" * 19
+        line += '\n'
+        head_col += line
+        print(head_col)
+    
     def get_all_empty_cell(self,board,x,y):
         cells = self.get_all_nearby_cell(x,y)
         emp_cells = [c for c in cells if board[c[0]][c[1]] == FREE]
