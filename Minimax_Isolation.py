@@ -1,3 +1,4 @@
+from re import I
 from time import time
 import numpy as np
 import random
@@ -138,14 +139,14 @@ class MinimaxIsolation(Minimax):
         x,y = self.pos_agent[agent_flag]
         return self.get_all_empty_cell(board,x,y)
     
-    def strategy1_check_point(self,board,componet_flag,cell):
+    def strategy1_check_point(self,board,component_flag,cell):
         x,y = self.pos_agent[component_flag]
         #left condition
         x_cell,y_cell = cell
         point = 0
-        if x_cell == 0 || y_cell == 0:
+        if x_cell == 0 or y_cell == 0:
             point = point - 2
-        if x_cell == WIDTH - 1 || y_cell == WIDTH - 1:
+        if x_cell == WIDTH - 1 or y_cell == WIDTH - 1:
             point = point - 2
         #left condition
         board[x_cell][y_cell] = BLOCK
@@ -163,15 +164,15 @@ class MinimaxIsolation(Minimax):
     def strategy1_block_move(self,board,component_flag,component_cell):
         if len(component_cell) == 8:
             return np.random.choice(component_cell)
-        else if len(component_cell) == 1:
+        elif len(component_cell) == 1:
             return component_cell[0]
         else:
             x,y = self.pos_agent[component_flag]
             max_point = -1000
             save_cell = None
             for cell in component_cell:
-                if self.strategy1_check_point(board,componet_flag,cell) > max_point:
-                    max_point = self.strategy1_check_point(board,componet_flag,cell)
+                if self.strategy1_check_point(board,component_flag,cell) > max_point:
+                    max_point = self.strategy1_check_point(board,component_flag,cell)
                     save_cell = cell
             return save_cell
                     
@@ -182,7 +183,7 @@ class MinimaxIsolation(Minimax):
             print("your turn {} with value:".format(player))
             x_new = int(input('x_pos: '))
             y_new = int(input('y_pos: '))
-            if board[x][y] != FREE:
+            if self.in_board(x_new,y_new) == False or board[x_new][y_new] != FREE:
                 print('ERROR because block not free')
                 continue
             x_now,y_now = self.pos_agent[player]
@@ -190,11 +191,27 @@ class MinimaxIsolation(Minimax):
             if (x_new,y_new) in available_move:
                 valid_move = True
                 print('valid_move!!!')
-                self.move_piece(board,player,(x_now,y_now),(x_new,y_new)):
+                #self.move_piece(board,player,(x_now,y_now),(x_new,y_new))
+                board[x_new][y_new] = ACTIVE[player]
+                board[x_now][y_now] = FREE
+                self.pos_agent[player] = (x_new,y_new)
+                
+                #componet BLOCK
+                print("remove block for component")
+                comp_flag = True
+                while comp_flag:
+                    x_comp = int(input('x_pos: '))
+                    y_comp = int(input('y_comp: '))
+                    if self.in_board(x_comp,y_comp) == False or board[x_comp][y_comp] != FREE:
+                        print("try again")
+                        continue
+                    else:
+                        board[x_comp][y_comp] = BLOCK
+                        comp_flag = False
             else:
                 print('try_again')
         
-    # def strategy2_block_move(self,component_flag,compoent_cell):
+    # def strategy2_block_move(self,component_flag,component_cell):
     #     pass
         
     def move_piece(self,board,player_flag,old_cell,new_cell):

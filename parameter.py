@@ -3,6 +3,7 @@ FREE = 0
 BLOCK = 2
 ACTIVE_P1 = 1 #component
 ACTIVE_P2 = -1 #component
+ACTIVE = {1 : ACTIVE_P1, -1 : ACTIVE_P2}
 
 #cell neighbor position
 dx = [-1,0,1,1,1,0,-1,-1]

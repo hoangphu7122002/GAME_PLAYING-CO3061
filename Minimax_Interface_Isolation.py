@@ -1,5 +1,5 @@
 from interface_game.Minmax_class import *
-from MinimaxIsolation import *
+from Minimax_Isolation import *
 
 class MinimaxII(MinimaxInterface):
     def __init__(self,depth,path = {}):
