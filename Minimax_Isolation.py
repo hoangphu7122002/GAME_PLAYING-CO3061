@@ -211,7 +211,7 @@ class MinimaxIsolation(Minimax):
         
         board[x_cell][y_cell] = FREE
         return point
-        
+    
     def strategy1_block_move(self,board,component_flag,component_cell):
         if len(component_cell) == 8:
             # print(component_cell)

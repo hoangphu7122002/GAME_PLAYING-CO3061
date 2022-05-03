@@ -3,34 +3,34 @@ from Minimax_Interface_Isolation import *
 import copy
 from Minimax_Isolation import *
 
-class iMinimaxVsMinmax_v1(BaseEnvironment):
-    def __init__(self):
-        self.depth = {-1 : 0, 1 : 0}
-        self.current_turn = 1
-        self.env = None
-        self.board = None
+# class iMinimaxVsMinmax_v1(BaseEnvironment):
+#     def __init__(self):
+#         self.depth = {-1 : 0, 1 : 0}
+#         self.current_turn = 1
+#         self.env = None
+#         self.board = None
         
-    def reset(self,depth1 = 4,depth2 = 5):
-        self.depth = {-1 : depth1, 1 : depth2}
-        self.board = MinimaxII(max(depth1, depth2),{}).getBoard()
-        return self.board.copy()
+#     def reset(self,depth1 = 4,depth2 = 5):
+#         self.depth = {-1 : depth1, 1 : depth2}
+#         self.board = MinimaxII(max(depth1, depth2),{}).getBoard()
+#         return self.board.copy()
     
-    def env_act(self):
-        pass
+#     def env_act(self):
+#         pass
     
-    def check_win(self):
-        return self.env.check_win(self.board,self.current_turn)
+#     def check_win(self):
+#         return self.env.check_win(self.board,self.current_turn)
 
-    def step(self):
-        turn = self.current_turn
+#     def step(self):
+#         turn = self.current_turn
         
-        self.env = MinimaxII(self.depth[turn],{})
-        self.env.minimax_act(self.board,turn)
-        reward,done = self.check_win()
+#         self.env = MinimaxII(self.depth[turn],{})
+#         self.env.minimax_act(self.board,turn)
+#         reward,done = self.check_win()
         
 
-        self.current_turn = turn * -1
-        return self.board.copy(),reward,done
+#         self.current_turn = turn * -1
+#         return self.board.copy(),reward,done
         
 class iMinimaxVSMinimax(BaseEnvironment):
     def __init__(self,depth,path={}):
@@ -173,11 +173,69 @@ class iHumanVSHuman(BaseEnvironment):
         self.env.player_move(self.board,self.current_turn) 
         reward,done = self.check_win()
         self.current_turn = -1 * self.current_turn
-        if done:
-            return copy.deepcopy(self.board), reward, done
         return copy.deepcopy(self.board),reward,done
 
-class iGenVSHuman(BaseEnvironment):
-    pass
+class iGenVSMinimax(BaseEnvironment):
+    def __init__(self,depth,path={}):
+        self.env = MinimaxIsolation(depth,None)
+        self.board = self.env.board
+        self.current_turn = 1
+        self.igen = 1
+        self.path = path
+
+    def reset(self,depth,igen):
+        self.env = MinimaxIsolation(depth,None)
+        self.board = self.env.board
+        # self.player_mark = 1
+        self.igen = igen
+        return copy.deepcopy(self.board)
+    
+    def action(self):
+        pass
+    
+    def get_act_space(self,board,player):
+        player_pos = self.env.get_pos(board,player)
+        new_space = self.env.get_all_empty_cell(board,player_pos[0],player_pos[1])
+        
+        action_space = [(player_pos,cell) for cell in new_space]
+        return action_space
+        
+    def sample_act(self,board,player):
+        action_space = self.get_act_space(board,player)
+        cell = random.choice(action_space)
+        
+        old,new = cell
+        board[old[0]][old[1]] = FREE
+        board[new[0]][new[1]] = player
+        
+        # component_action_space = self.get_act_space(board,-player)
+        # self.env.move_piece(board,player,old,new)
+        # self.board = board
+        
+        new_comp = []
+        for i in range(len(board)):
+            for j in range(len(board)):
+                if board[i][j] == FREE:
+                    new_comp.append((i,j))
+        new_comp_rand = random.choice(new_comp)
+        board[new_comp_rand[0]][new_comp_rand[1]] = BLOCK
+    
+        # board = self.env.board.copy()
+        return old,new
+    
+    def check_win(self):
+        point,flag = self.env.check_win(self.board,self.current_turn)
+        return point,flag
+    
+    def step(self):
+        if self.igen == self.current_turn: #gen move first
+            old,new = self.sample_act(self.env.board,self.current_turn)
+        else:
+            old,new = self.env.aimove(self.env.board,self.current_turn)
+            
+        self.board = self.env.board
+        reward,done = self.check_win()
+        self.current_turn = -1 * self.current_turn
+        return copy.deepcopy(self.board),reward,done
 
 #==============COMING SOON=============
