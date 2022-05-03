@@ -1,15 +1,22 @@
 from isolationEnv import *
 
 if __name__ == '__main__':
-    #initialize
-    env = iHumanVSHuman()
-    max_step = 17
+    env = iMinimaxVSHuman(1000)
+    max_step = 18
     
     done = False
-    print("==========ISOLATION========")
+    print("=======ISOLATION=======")
     env.print_board()
     
-    for i in range(max_step * 2 + 1):
+    print("do you want to go first?")
+    
+    player_turn = None
+    while player_turn != 1 and player_turn != -1:
+        player_turn = int(input('press 1 => to go first and -1 => to go second: '))
+    state = env.reset(player_turn,1000,{})
+    
+    for i in range(max_step):
+        
         state, reward, done = env.step()  
         if done:
             break
@@ -24,5 +31,5 @@ if __name__ == '__main__':
     print(reward)
     
     print("OUT_GAME")
-        
     
+    pass
