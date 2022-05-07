@@ -26,3 +26,12 @@ DIRECTION = {
 }
 
 DIRECTION_LABEL = ["left","right","up","down"]
+
+#color for display GUI python
+blue = (104, 149, 197)
+black = (0, 0, 0)
+white = (255,255,255)
+red = (255,69,0)
+yellow = (255,255,0)
+blue_second = (130,202,250)
+red_first = (244,41,65)
