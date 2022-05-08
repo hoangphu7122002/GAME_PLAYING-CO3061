@@ -90,23 +90,36 @@ class Gui(object):
         time_surface = self.game_font.render('TIME: {:.2f}s'.format(time),True,black)
         time_rect = time_surface.get_rect(center = (925,590))
         self.window.blit(time_surface,time_rect)
-    def interupt(self,run):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                # throw: Exception("interupt program")
-                return False
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_ESCAPE:
-                    # throw: Exception("interupt program")
-                    return False
-        return True
-    def display(self, step = 0,time_ = 0, second = 10):
-        pygame.init()
+    # def interupt(self,run):
+    #     for event in pygame.event.get():
+    #         if event.type == pygame.QUIT:
+    #             # throw: Exception("interupt program")
+    #             return False
+    #         if event.type == pygame.KEYUP:
+    #             if event.key == pygame.K_ESCAPE:
+    #                 # throw: Exception("interupt program")
+    #                 return False
+    #     return True
+    
+    def display(self, step = 0,time_ = 0, second = 1):
+        # pygame.init()
         self.render_font(step,time_)
         self.draw_board()
         pygame.display.flip()  # Refresh display
-        if second != 0:
-            time.sleep(second)
+        # if second != 0:
+        #     time.sleep(second)
+        # run = True
+        # while run:
+        #     for event in pygame.event.get():
+        #         if event.type == pygame.QUIT:
+        #         # throw: Exception("interupt program")
+        #             run = False
+        #         elif event.type == pygame.KEYUP:
+        #             if event.key == pygame.K_ESCAPE:
+        #                 # throw: Exception("interupt program")
+        #                 run = False
+        #         else:
+        time.sleep(second)
         # else:
             # while self.interupt():
             #     time.sleep(1)

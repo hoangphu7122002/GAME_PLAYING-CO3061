@@ -2,6 +2,7 @@ from doctest import DONT_ACCEPT_BLANKLINE
 from isolationEnv import *
 from helper_function import *
 from time import sleep
+from GUI import *
 
 if __name__ == "__main__":
     env = iGenVSMinimax(1000)
@@ -20,7 +21,9 @@ if __name__ == "__main__":
             if done:
                 break
             print_board(env.board)
-            sleep(2)
+            a = Gui(state)
+            a.display()
+            # sleep(2)
         if reward > 0:
             print("player1 WON!!!: ",reward)
         elif reward < 0:
