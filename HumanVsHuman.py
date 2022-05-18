@@ -1,28 +1,29 @@
 from isolationEnv import *
+from GUI import *
+from parameter import *
+
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+screen.fill(BLACK)
+board_game = np.ones((SHAPE[1], SHAPE[0])) * (FREE)
+board_game[POS['ACTIVE_P1'][0]][POS['ACTIVE_P1'][1]] = ACTIVE_P1
+board_game[POS['ACTIVE_P2'][0]][POS['ACTIVE_P2'][1]] = ACTIVE_P2
 
 if __name__ == '__main__':
     #initialize
     env = iHumanVSHuman()
-    max_step = 17
-    
+    for i in range(0, len(dx)):
+        if (POS['ACTIVE_P1'][0] +dx[i] in range(0, SHAPE[0]) and POS['ACTIVE_P1'][1] +dy[i] in range(0, SHAPE[1]) and board_game[POS['ACTIVE_P1'][0] +dx[i]][POS['ACTIVE_P1'][1] +dy[i]] == FREE):
+            POS['VALID'].append([POS['ACTIVE_P1'][0] +dx[i], POS['ACTIVE_P1'][1] +dy[i]])
     done = False
-    print("==========ISOLATION========")
-    env.print_board()
-    
-    for i in range(max_step * 2 + 1):
+    while not ENDGAME[0]:
+        # updateGame()
         state, reward, done = env.step()  
         if done:
-            break
-        env.print_board()
-        print("REWARD",reward)
-    if reward > 0:
-        print("player1 WON!!!")
-    elif reward < 0:
-        print("player2 WON!!!") 
-    else:
-        print("TIE")
-    print(reward)
-    
-    print("OUT_GAME")
+            ENDGAME[0] = True
+        a = Gui(state)
+        # print(state)
+        a.display()
         
+        if (ENDGAME[0]):
+            time.sleep(5)
     

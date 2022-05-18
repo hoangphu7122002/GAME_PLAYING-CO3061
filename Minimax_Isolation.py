@@ -6,6 +6,8 @@ from parameter import *
 import copy
 from interface_game.Minmax_class import *
 import random
+import pygame
+import sys
 
 class MinimaxIsolation(Minimax):
     def __init__(self,depth,board = None):
@@ -13,12 +15,12 @@ class MinimaxIsolation(Minimax):
         if board != None:
             self.board = board
         else:
-            self.board = np.zeros((WIDTH,WIDTH))
+            self.board = np.zeros(SHAPE)
         self.pos_agent = [(0,0),(0,0),(0,0)]
         self.pos_agent[1] = (0,3)
         self.pos_agent[-1] = (5,2)
-        self.board[0][3] = ACTIVE_P1
-        self.board[5][2] = ACTIVE_P2
+        self.board[POS['ACTIVE_P1'][0]][POS['ACTIVE_P1'][1]] = ACTIVE_P1
+        self.board[POS['ACTIVE_P2'][0]][POS['ACTIVE_P2'][1]] = ACTIVE_P2
     
     def get_all_nearby_cell(self,x,y):
         cells = []
@@ -70,7 +72,7 @@ class MinimaxIsolation(Minimax):
         return emp_cells
         
     def move(self,board,player): 
-        print("player: ",player)
+        # print("player: ",player)
         maximizer = int(player == 1)
         result = self.minimax(board,player,maximizer,alpha=float('-inf'),beta=float('inf'),depth=self.MINIMAX_DEPTH)
         if result[1] is None:
@@ -97,9 +99,9 @@ class MinimaxIsolation(Minimax):
         return self.evaluate_board(board,current_turn),self.checkEnd(board,current_turn)
         
     def in_board(self,x,y):
-        if x < 0 or x >= WIDTH:
+        if x < 0 or x >= SHAPE[0]:
             return False
-        if y < 0 or y >= WIDTH:
+        if y < 0 or y >= SHAPE[1]:
             return False
         return True
 
@@ -123,17 +125,17 @@ class MinimaxIsolation(Minimax):
         component_pieces = self.get_player_piece(board,-1 * player)
         player_pieces = self.get_player_piece(board,player)
         #winner
-        print('component_pieces: ',component_pieces,len(component_pieces))
+        # print('component_pieces: ',component_pieces,len(component_pieces))
         if len(component_pieces) == 0:
             value = float('inf')
             return (value,None,depth)
-        print('player_pieces: ',player_pieces,len(player_pieces))
+        # print('player_pieces: ',player_pieces,len(player_pieces))
         if len(player_pieces) == 0:
-            print("here")
+            # print("here")
             value = float('-inf')
             return (value,None,depth)
         #maximizer <-> 1 -> player(1); 0 -> player(1); 
-        print("maximizer: ",maximizer)
+        # print("maximizer: ",maximizer)
         if maximizer == 1:
             best_value = float('-inf')
             best_move = None
@@ -197,7 +199,7 @@ class MinimaxIsolation(Minimax):
         point = 0
         if x_cell == 0 or y_cell == 0:
             point = point - 2
-        if x_cell == WIDTH - 1 or y_cell == WIDTH - 1:
+        if x_cell == SHAPE[0] - 1 or y_cell == SHAPE[1] - 1:
             point = point - 2
         #left condition
         board[x_cell][y_cell] = BLOCK
@@ -228,70 +230,157 @@ class MinimaxIsolation(Minimax):
                     save_cell = cell
             return save_cell
                     
-    def player_move(self,board,player):
-        valid_move = False
+    # def player_move(self,board,player):
+    #     valid_move = False
         
-        while not valid_move:
-            if player == 1:
-                name = 'P1'
-            else:
-                name = 'P2'
-            print("your turn {} with value:".format(name))
-            x_now,y_now = self.get_pos(board,player)
-            print("now:",x_now,y_now)
-            x_new,y_new = input('pos: ').split(' ')
-            x_new = int(x_new)
-            y_new = int(y_new)
-            if self.in_board(x_new,y_new) == False or board[x_new][y_new] != FREE:
-                print('ERROR because block not free')
-                continue
-            print("new: ",x_new,y_new)
-            available_move = self.get_all_empty_cell(board,x_now,y_now)
-            print(available_move)
-            if (x_new,y_new) in available_move:
-                valid_move = True
-                print('valid_move!!!')
-                #self.move_piece(board,player,(x_now,y_now),(x_new,y_new))
-                board[x_new][y_new] = ACTIVE[player]
-                board[x_now][y_now] = FREE
-                # self.pos_agent[player] = (x_new,y_new)
+    #     while not valid_move:
+    #         if player == 1:
+    #             name = 'P1'
+    #         else:
+    #             name = 'P2'
+    #         print("your turn {} with value:".format(name))
+    #         x_now,y_now = self.get_pos(board,player)
+    #         print("now:",x_now,y_now)
+    #         # x_new,y_new = int(pygame.mouse.get_pos()[1] / EDGE), int(pygame.mouse.get_pos()[0] / EDGE)
+    #         # x_new = int(x_new)
+    #         # y_new = int(y_new)
+    #         # if self.in_board(x_new,y_new) == False or board[x_new][y_new] != FREE:
+    #         #     print('ERROR because block not free')
+    #         #     continue
+    #         # print("new: ",x_new,y_new)
+    #         POS['VALID'] = self.get_all_empty_cell(board,x_now,y_now)
+    #         print(POS['VALID'])
+    #         for event in pygame.event.get():
+    #             if event.type == pygame.QUIT:
+    #                 pygame.quit()
+    #                 sys.exit()
                 
-                #componet BLOCK
-                print("remove block for component")
-                x_comp,y_comp = self.get_pos(board,-player)
-                print("comp:",x_comp,y_comp)
-                comp_flag = True
-                while comp_flag:
-                    x_comp,y_comp = input('block_comp: ').split(' ')
-                    x_comp = int(x_comp)
-                    y_comp = int(y_comp)
-                    # y_comp = int(input('y_comp: '))
-                    if self.in_board(x_comp,y_comp) == False or board[x_comp][y_comp] != FREE:
-                        print("try again")
+    #             if event.type == pygame.MOUSEBUTTONDOWN:
+    #                 if pygame.mouse.get_pressed() == (1, 0, 0):
+    #                     # print(pygame.mouse.get_pos())
+    #                     POS['SELECT'] = [int((pygame.mouse.get_pos()[1] - OFFSET) / EDGE), int((pygame.mouse.get_pos()[0] - OFFSET) / EDGE)]
+    #                     # print(POS['SELECT'])
+    #                     # if not POS['SELECT'] in POS['VALID']:
+    #                     #     continue
+    #         if POS['SELECT'] in POS['VALID']:
+    #             valid_move = True
+    #             print('valid_move!!!')
+    #             #self.move_piece(board,player,(x_now,y_now),(x_new,y_new))
+    #             board[POS['SELECT'][0]][POS['SELECT'][1]] = ACTIVE[player]
+    #             board[x_now][y_now] = FREE
+    #             # self.pos_agent[player] = (x_new,y_new)
+                
+    #             #componet BLOCK
+    #             print("remove block for component")
+    #             x_comp,y_comp = self.get_pos(board,-player)
+    #             print("comp:",x_comp,y_comp)
+    #             comp_flag = True
+    #             POS['VALID'].clear()
+    #             for r in range(0, SHAPE[0]):
+    #                 for c in range(0, SHAPE[1]):
+    #                     if (board[r][c] == FREE and [r, c] != POS['ACTIVE_P1'] and [r, c] != POS['ACTIVE_P2']):
+    #                         POS['VALID'].append([r, c])
+    #             while comp_flag:
+    #                 # x_comp,y_comp = input('block_comp: ').split(' ')
+    #                 # x_comp = int(x_comp)
+    #                 # y_comp = int(y_comp)
+                    
+    #                 for event in pygame.event.get():
+    #                     if event.type == pygame.QUIT:
+    #                         pygame.quit()
+    #                         sys.exit()
+                        
+    #                     if event.type == pygame.MOUSEBUTTONDOWN:
+    #                         if pygame.mouse.get_pressed() == (1, 0, 0):
+    #                             # print(pygame.mouse.get_pos())
+    #                             POS['SELECT'] = [int((pygame.mouse.get_pos()[1] - OFFSET) / EDGE), int((pygame.mouse.get_pos()[0] - OFFSET) / EDGE)]
+    #                             # print(POS['SELECT'])
+    #                             if not POS['SELECT'] in POS['VALID']:
+    #                                 continue
+    #                             else:
+    #                                 board[POS['SELECT'][0]][POS['SELECT'][1]] = BLOCK
+    #                                 comp_flag = False
+    #             self.board = board
+    #         else:
+    #             print('try_again')
+    def player_move(self,board,player):
+        # print(2222)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if pygame.mouse.get_pressed() == (1, 0, 0):
+                    # print(pygame.mouse.get_pos())
+                    POS['SELECT'] = [int((pygame.mouse.get_pos()[1] - OFFSET) / EDGE), int((pygame.mouse.get_pos()[0] - OFFSET) / EDGE)]
+                    # print(POS['SELECT'])
+                    if not POS['SELECT'] in POS['VALID']:
                         continue
-                    else:
-                        board[x_comp][y_comp] = BLOCK
-                        comp_flag = False
-                self.board = board
-            else:
-                print('try_again')
-        
+                    # rect = pygame.Rect(POS['SELECT'][1] * EDGE, POS['SELECT'][0] * EDGE, EDGE, EDGE)   
+                    # pygame.draw.rect(screen, YELLOW, rect)
+                    global TURN
+                    valid = False
+                    if TURN[0] == 0:
+                        self.board[POS['ACTIVE_P1'][0]][POS['ACTIVE_P1'][1]] = FREE
+                        POS['ACTIVE_P1'] = copy.deepcopy(POS['SELECT'])
+                        self.board[POS['ACTIVE_P1'][0]][POS['ACTIVE_P1'][1]] = ACTIVE_P1
+                        ### move selected quickly
+                        POS['VALID'].clear()
+                        for r in range(0, SHAPE[0]):
+                            for c in range(0, SHAPE[1]):
+                                if (board[r][c] == FREE and [r, c] != POS['ACTIVE_P1'] and [r, c] != POS['ACTIVE_P2']):
+                                    POS['VALID'].append([r, c])
+                        #####
+                        valid = True
+                    elif TURN[0] == 1 or TURN[0] == 3:
+                        # if (board_game[POS['SELECT'][0]][POS['SELECT'][1]] == FREE):
+                        self.board[POS['SELECT'][0]][POS['SELECT'][1]] = BLOCK
+                        ### move selected quickly
+                        if TURN[0] == 1:
+                            POS['VALID'].clear()
+                            for i in range(0, len(dx)):
+                                if (POS['ACTIVE_P2'][0] +dx[i] in range(0, SHAPE[0]) and POS['ACTIVE_P2'][1] +dy[i] in range(0, SHAPE[1]) and self.board[POS['ACTIVE_P2'][0] +dx[i]][POS['ACTIVE_P2'][1] +dy[i]] == FREE):
+                                    POS['VALID'].append([POS['ACTIVE_P2'][0] +dx[i], POS['ACTIVE_P2'][1] +dy[i]])
+                        elif TURN[0] == 3:
+                            POS['VALID'].clear()
+                            for i in range(0, len(dx)):
+                                if (POS['ACTIVE_P1'][0] +dx[i] in range(0, SHAPE[0]) and POS['ACTIVE_P1'][1] +dy[i] in range(0, SHAPE[1]) and self.board[POS['ACTIVE_P1'][0] +dx[i]][POS['ACTIVE_P1'][1] +dy[i]] == FREE):
+                                    POS['VALID'].append([POS['ACTIVE_P1'][0] +dx[i], POS['ACTIVE_P1'][1] +dy[i]])
+                        #####
+                        valid = True
+                    elif TURN[0] == 2:
+                        # if (abs(POS['SELECT'][0] - POS['ACTIVE_P2'][0]) + abs(POS['SELECT'][1] - POS['ACTIVE_P2'][1]) == 1):
+                        self.board[POS['ACTIVE_P2'][0]][POS['ACTIVE_P2'][1]] = FREE
+                        POS['ACTIVE_P2'] = copy.deepcopy(POS['SELECT'])
+                        self.board[POS['ACTIVE_P2'][0]][POS['ACTIVE_P2'][1]] = ACTIVE_P2
+                        valid = True
+                        ### move selected quickly
+                        POS['VALID'].clear()
+                        for r in range(0, SHAPE[0]):
+                            for c in range(0, SHAPE[1]):
+                                if (board[r][c] == FREE and [r, c] != POS['ACTIVE_P1'] and [r, c] != POS['ACTIVE_P2']):
+                                    POS['VALID'].append([r, c])
+                        #####
+                    if valid:
+                        TURN[0] = (TURN[0] + 1) % 4
+    
     # def strategy2_block_move(self,component_flag,component_cell):
     #     pass
         
     def get_pos(self,board,flag):
-        for i in range(WIDTH):
-            for j in range(WIDTH):
+        for i in range(SHAPE[1]):
+            for j in range(SHAPE[0]):
                 if board[i][j] == flag:
                     return (i,j)
         return None
         
     def move_piece(self,board,player_flag,old_cell,new_cell):
-        print("player:",player_flag)
-        print("cell pos: ",old_cell,new_cell)
+        # print("player:",player_flag)
+        # print("cell pos: ",old_cell,new_cell)
         component_flag = -player_flag
-        print("old_cell: ",old_cell)
-        print("new_cell: ",new_cell)
+        # print("old_cell: ",old_cell)
+        # print("new_cell: ",new_cell)
         assert(board[old_cell[0]][old_cell[1]] == player_flag and board[new_cell[0]][new_cell[1]] == FREE)
                 
         board[new_cell[0]][new_cell[1]] = player_flag
@@ -305,4 +394,4 @@ class MinimaxIsolation(Minimax):
 
         component_cell_strategy1 = self.strategy1_block_move(board,component_flag,component_cell)
         board[component_cell_strategy1[0]][component_cell_strategy1[1]] = BLOCK 
-        self.print_board(board)
+        # self.print_board(board)
